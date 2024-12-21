@@ -1,6 +1,0 @@
-ktor:
-  application:
-    modules:
-      - io.github.damir.denis.tudor.ktor.service.registry.ApplicationKt.module
-  deployment:
-    port: 8080

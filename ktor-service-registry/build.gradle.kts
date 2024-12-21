@@ -1,40 +1,94 @@
-val kotlin_version: String by project
-val logback_version: String by project
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val logbackVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
-    id("io.ktor.plugin") version "3.0.2"
+    id("maven-publish")
+    id("signing")
 }
 
-group = "io.github.damir.denis.tudor.ktor.service.registry"
+group = "io.github.damirdenis-tudor"
 version = "0.0.1"
-
-application {
-    mainClass.set("io.ktor.server.netty.EngineMain")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.ktor:ktor-server-netty-jvm")
-    implementation("io.ktor:ktor-server-content-negotiation")
+    // server dependencies
+    implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
 
-    implementation("io.ktor:ktor-client-core")
-    implementation("io.ktor:ktor-client-cio")
-    implementation("io.ktor:ktor-client-content-negotiation")
+    // client dependencies
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    // serialization
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-config-yaml-jvm")
+    //logging
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
-    testImplementation("io.ktor:ktor-server-test-host-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    // config
+    implementation("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
+
+    // testing
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+}
+
+tasks.register<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks["javadoc"])
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("kotlin") {
+            groupId = "io.github.damirdenis-tudor"
+            artifactId = "ktor-service-registry"
+            from(components["java"])
+
+            artifact(tasks["kotlinSourcesJar"])
+            artifact(tasks["javadocJar"])
+
+            pom {
+                name.set("Ktor rabbitMQ plugin")
+                packaging = "jar"
+                description.set(
+                    "Ktor service registry that support gossip like information dissemination."
+                )
+
+                url.set("https://github.com/DamirDenis-Tudor/ktor-server-discovery")
+
+                scm {
+                    connection.set("scm:git:https://github.com/DamirDenis-Tudor/ktor-server-discovery.git")
+                    developerConnection.set("scm:git:git@github.com:DamirDenis-Tudor/ktor-server-discovery.git")
+                    url.set("https://github.com/DamirDenis-Tudor/ktor-server-discovery")
+                }
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("DamirDenis-Tudor")
+                        name.set("Damir Denis-Tudor")
+                        email.set("denis-tudor.damir@student.tuiasi.ro")
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
