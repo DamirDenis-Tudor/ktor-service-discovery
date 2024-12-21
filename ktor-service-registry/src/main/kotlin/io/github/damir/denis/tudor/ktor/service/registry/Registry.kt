@@ -1,11 +1,7 @@
-package io.github.damir.denis.tudor.ktor.service.registry.gossip
+package io.github.damir.denis.tudor.ktor.service.registry
 
-import kotlinx.serialization.Serializable
 
-data class Registry(val services: Map<String, List<Service>> = emptyMap()) {
-
-    @Serializable
-    data class Service(val pattern: String, val id: String, val name: String, val address: String)
+internal data class Registry(val services: Map<String, List<Service>> = emptyMap()) {
 
     operator fun plus(service: Service): Registry {
         val patternServices = services[service.pattern] ?: emptyList()
@@ -21,9 +17,10 @@ data class Registry(val services: Map<String, List<Service>> = emptyMap()) {
     }
 
     operator fun get(pattern: String): List<Service> {
-        println(services[pattern])
         return services[pattern] ?: emptyList()
     }
+
     operator fun get(pattern: String, id: String): Service? =
         services[pattern]?.firstOrNull { it.id == id }
+
 }
