@@ -39,7 +39,7 @@ class ActionHandler(private val config: Config, ) {
         val currentCycle = actionCycleCounts.getOrDefault(action, 0)
 
         if (currentCycle >= peerRegistry.convergenceCycles) {
-            logger.debug("Action <$action> has exceeded the convergence cycles of ${peerRegistry.convergenceCycles}.")
+            logger.debug("Action <{}> has exceeded the convergence cycles of {}.", action, peerRegistry.convergenceCycles)
             return
         }
 
@@ -50,7 +50,7 @@ class ActionHandler(private val config: Config, ) {
 
         actionCycleCounts[action] = currentCycle + 1
 
-        logger.debug("Action <$action> processed, cycle count is now ${currentCycle + 1}.")
+        logger.debug("Action <{}> processed, cycle count is now {}.", action, currentCycle + 1)
     }
 
     @OptIn(InternalAPI::class)

@@ -15,7 +15,7 @@ class PeerRegistry(private val config: Config) {
     private val peersMutex = Mutex()
 
     private var convergence: Long = 0L
-    private val mutablePeers: MutableSet<String> = mutableSetOf()
+    private var mutablePeers: Set<String> = emptySet()
 
     val peers: Set<String>
         get() = mutablePeers.toSet()
@@ -35,9 +35,9 @@ class PeerRegistry(private val config: Config) {
 
     private suspend fun updatePeers() {
         peersMutex.withLock {
-            mutablePeers.addAll(resolvePeers())
+            mutablePeers = resolvePeers()
             convergence = calculateConvergenceRate()
-            logger.debug("Expected convergence in $convergence cycles - fanout: ${config.gossipFanout}, peers: ${mutablePeers.count()}.")
+            logger.trace("Expected convergence in $convergence cycles - fanout: ${config.gossipFanout}, peers: ${mutablePeers.count()}.")
         }
     }
 
@@ -48,11 +48,12 @@ class PeerRegistry(private val config: Config) {
                     InetAddress.getAllByName(config.registryDnsPattern)
                         .map { it.hostAddress }
                         .filter { it != address.hostAddress }
+                        .toMutableSet()
                 }.getOrElse {
                     logger.error("Error resolving peers: ${it.message}")
-                    emptyList()
+                    mutableSetOf()
                 }.apply {
-                    logger.debug("Peers discovered: {}", this)
+                    logger.trace("Peers discovered: {}", this)
                 }
             }
     }
