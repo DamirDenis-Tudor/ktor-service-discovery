@@ -1,8 +1,8 @@
 import io.github.damir.denis.tudor.ktor.service.Registry
-import io.github.damir.denis.tudor.ktor.service.extensions.registry
+import io.github.damir.denis.tudor.ktor.service.registry
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import io.ktor.server.testing.testApplication
+import io.ktor.server.testing.*
 import kotlin.test.Test
 
 fun Application.test() {
@@ -13,7 +13,7 @@ fun Application.test() {
     }
 
     routing {
-        registry("/v1/registry")
+        registry()
     }
 }
 
@@ -22,7 +22,6 @@ class PluginTest {
     fun test() = testApplication {
         application {
             test()
-
         }
     }
 }
