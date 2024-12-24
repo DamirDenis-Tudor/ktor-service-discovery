@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Service(
     val pattern: String,
-    val id: String,
-    val name: String,
-    val address: String
+    val identity: String,
+    val rootAddress: String,
+    val timeToLive: Long,
+    val timeStarted: Long = System.currentTimeMillis(),
 )
