@@ -9,7 +9,7 @@ import java.net.InetAddress
 import kotlin.math.ceil
 import kotlin.math.ln
 
-class PeerRegistry(private val config: Config) {
+class PeerRegistry {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
     private val peersMutex = Mutex()
@@ -22,6 +22,10 @@ class PeerRegistry(private val config: Config) {
 
     val convergenceCycles: Long
         get() = convergence
+
+    companion object {
+        lateinit var config: Config
+    }
 
     init {
         CoroutineScope(Dispatchers.IO).launch {

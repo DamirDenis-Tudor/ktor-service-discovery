@@ -15,15 +15,19 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
-class ActionHandler(private val config: Config, ) {
+class ActionHandler {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
     private val receiver = Channel<Action>()
 
-    private val peerRegistry = PeerRegistry(config)
+    private val peerRegistry = PeerRegistry()
     private val httpClient = HttpClient(CIO)
 
     private val actionCycleCounts = mutableMapOf<Action, Int>()
+
+    companion object {
+        lateinit var config: Config
+    }
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
@@ -60,7 +64,7 @@ class ActionHandler(private val config: Config, ) {
                 httpClient.request("http://$peer:${config.registryPort}/v1/registry/register") {
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
-                    body = Json.encodeToString(action)
+                    body = Json.encodeToString(action.service)
                 }
             }.onSuccess {
                 logger.debug("Successfully sent RegisterService action to peer <{}>.", peer)
@@ -77,7 +81,7 @@ class ActionHandler(private val config: Config, ) {
                 httpClient.request("http://$peer:${config.registryPort}/v1/registry/unregister") {
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
-                    body = Json.encodeToString(action)
+                    body = Json.encodeToString(action.service)
                 }
             }.onSuccess {
                 logger.debug("Successfully sent UnregisterService action to peer <{}>.", peer)
