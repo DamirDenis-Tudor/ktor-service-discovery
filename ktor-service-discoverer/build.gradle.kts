@@ -1,0 +1,43 @@
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val logbackVersion: String by project
+
+plugins {
+    kotlin("jvm") version "2.1.0"
+    id("io.ktor.plugin") version "3.0.2"
+}
+
+group = "io.github.damir.denis.tudor.ktor.service"
+version = "0.0.1"
+
+application {
+    mainClass.set("io.ktor.server.netty.EngineMain")
+
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // server dependencies
+    implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-server-netty-jvm")
+
+    // client dependencies
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
+    // logging
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+
+    // config
+    implementation("io.ktor:ktor-server-config-yaml-jvm")
+
+    // testing
+    testImplementation("io.ktor:ktor-server-test-host-jvm")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+}
