@@ -3,9 +3,10 @@ package io.github.damir.denis.tudor.ktor.service.discoverable
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class Service(
+data class Service(
     val pattern: String,
-    val id: String,
-    val name: String,
-    val address: String
+    val identity: String,
+    val rootAddress: String,
+    val timeToLive: Long,
+    val timeStarted: Long = System.currentTimeMillis(),
 )

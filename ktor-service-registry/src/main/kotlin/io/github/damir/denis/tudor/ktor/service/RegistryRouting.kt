@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 
 fun Routing.registry() {
     val actionHandler = ActionHandler()
-    val registry = ServiceRegistry()
+    val registry = application.attributes[ServiceRegistryKey]
 
     route("/v1/registry") {
         get("/services/{pattern}") {
