@@ -13,23 +13,23 @@ import kotlinx.serialization.json.Json
 class Discoverable(private val config: Config) {
     private val httpClient = HttpClient(CIO)
 
-    private var serviceInfo = Service(
-        pattern = config.servicePattern,
-        id = config.serviceIdentity,
-        name = "",
-        address = config.serviceRootUrl,
-    )
+    private fun Service.encodeToString() = Json.encodeToString(this)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
+                delay(config.heartbeatInterval / 2 * 1000)
                 httpClient.request(config.serviceRegistryAddress) {
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
-                    body = Json.encodeToString(serviceInfo)
+                    body = Service(
+                        pattern = config.servicePattern,
+                        identity = config.serviceIdentity,
+                        rootAddress = config.serviceRootUrl,
+                        timeToLive = config.timeToLiveInterval,
+                    ).encodeToString()
                 }
-
-                delay(config.heartbeatInterval * 1000)
+                delay(config.heartbeatInterval / 2 * 1000)
             }
         }
     }

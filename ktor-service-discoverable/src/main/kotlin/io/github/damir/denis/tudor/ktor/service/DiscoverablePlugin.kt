@@ -8,7 +8,7 @@ import io.ktor.util.*
 val DiscoverableKey = AttributeKey<Discoverable>("DiscoverableKey")
 
 val Discoverable = createApplicationPlugin(
-    name = "Registry",
+    name = "Discoverable",
     configurationPath = "ktor.discoverable",
     createConfiguration = ::Config
 ) {

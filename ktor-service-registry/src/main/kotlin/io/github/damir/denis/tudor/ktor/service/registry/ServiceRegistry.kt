@@ -12,18 +12,19 @@ class ServiceRegistry {
         lateinit var config: Config
     }
 
-    private fun Service.isExpired(): Boolean = System.currentTimeMillis() - timeStarted >= timeToLive
+    private fun Service.isExpired(): Boolean = System.currentTimeMillis() - timeStarted >= (timeToLive * 1_000)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
-                delay(5)
                 mutex.withLock {
                     registry = Registry(
                         registry.services.mapValues { (_, patternServices) ->
                             patternServices.filterNot { it.isExpired() }
                         }
                     )
+                    println(registry)
+                    delay(config.registryCleanUpInterval * 1_000)
                 }
             }
         }
