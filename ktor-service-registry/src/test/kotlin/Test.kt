@@ -1,4 +1,4 @@
-import io.github.damir.denis.tudor.ktor.service.Registry
+import io.github.damir.denis.tudor.ktor.registry.plugin.Registry
 import io.github.damir.denis.tudor.ktor.service.registry
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
