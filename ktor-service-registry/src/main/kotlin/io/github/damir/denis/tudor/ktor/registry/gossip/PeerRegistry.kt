@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.gossip
 
-import io.github.damir.denis.tudor.ktor.registry.service.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.Config
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -24,6 +24,7 @@ class PeerRegistry {
         get() = convergence
 
     companion object {
+        lateinit var host: String
         lateinit var config: Config
     }
 
@@ -46,7 +47,7 @@ class PeerRegistry {
     }
 
     private suspend fun resolvePeers() = withContext(Dispatchers.IO) {
-        InetAddress.getByName(config.registryHostname)
+        InetAddress.getByName(host)
             .let { address ->
                 runCatching {
                     InetAddress.getAllByName(config.registryDnsPattern)

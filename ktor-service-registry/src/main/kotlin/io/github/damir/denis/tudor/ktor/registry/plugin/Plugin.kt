@@ -2,7 +2,6 @@ package io.github.damir.denis.tudor.ktor.registry.plugin
 
 import io.github.damir.denis.tudor.ktor.registry.gossip.ActionHandler
 import io.github.damir.denis.tudor.ktor.registry.gossip.PeerRegistry
-import io.github.damir.denis.tudor.ktor.registry.service.Config
 import io.github.damir.denis.tudor.ktor.registry.service.Service
 import io.github.damir.denis.tudor.ktor.registry.service.ServiceRegistry
 import io.ktor.http.*
@@ -21,9 +20,15 @@ val Registry = createApplicationPlugin(
     configurationPath = "ktor.registry",
     createConfiguration = ::Config
 ) {
+    pluginConfig.validate()
+
     ActionHandler.config = pluginConfig
-    ServiceRegistry.config = pluginConfig
+    ActionHandler.port = applicationConfig.port
+
     PeerRegistry.config = pluginConfig
+    PeerRegistry.host = applicationConfig.host
+
+    ServiceRegistry.config = pluginConfig
 
     application.attributes.put(ServiceRegistryKey, ServiceRegistry())
 

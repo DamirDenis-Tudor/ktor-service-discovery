@@ -1,5 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.discoverer
 
+import io.github.damir.denis.tudor.ktor.registry.plugin.Config
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
