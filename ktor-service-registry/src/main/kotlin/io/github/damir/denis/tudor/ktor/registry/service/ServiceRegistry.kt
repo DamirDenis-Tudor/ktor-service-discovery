@@ -2,6 +2,7 @@ package io.github.damir.denis.tudor.ktor.registry.service
 
 import io.github.damir.denis.tudor.ktor.registry.gossip.Action
 import io.github.damir.denis.tudor.ktor.registry.gossip.ActionHandler
+import io.github.damir.denis.tudor.ktor.registry.plugin.Config
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -24,12 +25,15 @@ class ServiceRegistry {
         CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
                 mutex.withLock {
+                    delay(config.registryCleanUpInterval * 1_000)
+
+                    logger.debug("Performing registry clean up.")
+
                     registry = Registry(
                         registry.services.mapValues { (_, patternServices) ->
                             patternServices.filterNot { it.isExpired() }
                         }
                     )
-                    delay(config.registryCleanUpInterval * 1_000)
                 }
             }
         }
@@ -39,8 +43,6 @@ class ServiceRegistry {
         logger.debug("Added service {}", service)
 
         registry += service
-        println(registry)
-
         actionHandler.publishAction(Action.RegisterService(service))
     }
 
@@ -49,7 +51,6 @@ class ServiceRegistry {
         logger.debug("Removed service {}", service)
 
         registry -= service
-
         actionHandler.publishAction(Action.UnregisterService(service))
     }
 

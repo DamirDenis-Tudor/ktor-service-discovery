@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.balancer
 
-import io.github.damir.denis.tudor.ktor.registry.discoverer.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.Config
 import io.github.damir.denis.tudor.ktor.registry.discoverer.Discoverer
 import io.github.damir.denis.tudor.ktor.registry.discoverer.Service
 import io.ktor.client.*

@@ -1,8 +1,8 @@
 package io.github.damir.denis.tudor.ktor.discoverable.service
 
+import io.github.damir.denis.tudor.ktor.discoverable.plugin.Config
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.logging.*
@@ -12,7 +12,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @OptIn(InternalAPI::class)
-class Discoverable(private val config: Config) {
+class Discoverable(
+    private val port: Int,
+    private val hostname: String,
+    private val config: Config
+) {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
     private val httpClient = HttpClient(CIO)
@@ -23,7 +27,7 @@ class Discoverable(private val config: Config) {
                 val service = Service(
                     pattern = config.servicePattern,
                     identity = config.serviceIdentity,
-                    rootAddress = "http://${config.serviceRootHostname}:${config.serviceRootPort}",
+                    rootAddress = "http://$hostname:$port",
                     timeToLive = config.timeToLiveInterval,
                 )
 

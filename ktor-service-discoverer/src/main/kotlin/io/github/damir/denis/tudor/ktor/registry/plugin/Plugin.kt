@@ -1,7 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.plugin
 
 import io.github.damir.denis.tudor.ktor.registry.balancer.LoadBalancer
-import io.github.damir.denis.tudor.ktor.registry.discoverer.Config
 import io.github.damir.denis.tudor.ktor.registry.discoverer.Discoverer
 import io.ktor.server.application.*
 import io.ktor.util.*
@@ -14,6 +13,7 @@ val Discoverer = createApplicationPlugin(
     configurationPath = "ktor.discoverer",
     createConfiguration = ::Config
 ) {
+    pluginConfig.validate()
     with(Discoverer(pluginConfig)) {
         application.attributes.put(DiscovererKey, this)
     }
