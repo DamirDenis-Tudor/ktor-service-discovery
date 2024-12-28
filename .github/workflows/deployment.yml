@@ -30,6 +30,9 @@ jobs:
   deploy-discoverable:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -52,6 +55,9 @@ jobs:
   deploy-discoverer:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -74,6 +80,9 @@ jobs:
   deploy-registry:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
