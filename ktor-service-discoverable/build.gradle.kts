@@ -1,3 +1,4 @@
+import org.jreleaser.model.Active
 
 val ktorVersion: String by project
 val kotlinVersion: String by project
@@ -7,12 +8,17 @@ plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
     id("io.ktor.plugin") version "3.0.2"
+    id("org.jreleaser") version "1.15.0"
     id("maven-publish")
     id("signing")
 }
 
-group = "io.github.damirdenis-tudor"
-version = "0.0.1"
+group = "io.github.damir.denis.tudor.ktor.service"
+version = project.findProperty("releaseVersion") ?: "1.0.0"
+
+val mavenCentralUsername = project.findProperty("mavenCentralUsername")?.toString() ?: ""
+val mavenCentralPasswordToken = project.findProperty("mavenCentralPasswordToken")?.toString() ?: ""
+val githubToken = project.findProperty("githubToken")?.toString() ?: "no_blank"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -54,26 +60,24 @@ tasks.register<Jar>("javadocJar") {
 publishing {
     publications {
         create<MavenPublication>("kotlin") {
-            groupId = "io.github.damirdenis-tudor"
-            artifactId = "ktor-service-discoverable"
+            groupId = project.group.toString()
+            artifactId = project.name
             from(components["java"])
 
             artifact(tasks["kotlinSourcesJar"])
             artifact(tasks["javadocJar"])
 
             pom {
-                name.set("Ktor Service Discoverable plugin")
+                name.set("Ktor Service Discoverable Plugin")
                 packaging = "jar"
-                description.set(
-                    "Ktor service registry that support gossip like information dissemination."
-                )
+                description.set("This plugin enables the discovery of services within a Ktor Service Registry.")
 
-                url.set("https://github.com/DamirDenis-Tudor/ktor-server-discovery")
+                url.set("https://github.com/DamirDenis-Tudor/ktor-service-discovery/tree/main/ktor-service-discoverable")
 
                 scm {
-                    connection.set("scm:git:https://github.com/DamirDenis-Tudor/ktor-server-discovery.git")
-                    developerConnection.set("scm:git:git@github.com:DamirDenis-Tudor/ktor-server-discovery.git")
-                    url.set("https://github.com/DamirDenis-Tudor/ktor-server-discovery")
+                    connection.set("scm:git:https://github.com/DamirDenis-Tudor/ktor-service-discovery.git")
+                    developerConnection.set("scm:git:git@github.com:DamirDenis-Tudor/ktor-service-discovery.git")
+                    url.set("https://github.com/DamirDenis-Tudor/ktor-service-discovery/tree/main/ktor-service-discoverable")
                 }
 
                 licenses {
@@ -94,6 +98,53 @@ publishing {
         }
     }
     repositories {
-        mavenLocal()
+        maven {
+            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications["kotlin"])
+}
+
+jreleaser {
+    release {
+        github {
+            token = githubToken
+        }
+        project {
+            name = "ktor-service-discoverable"
+            description.set("Ktor Service Discoverable plugin")
+            copyright.set("Damir Denis-Tudor")
+        }
+        deploy {
+            maven {
+                mavenCentral {
+                    create("sonatype") {
+                        active = Active.RELEASE
+                        url = "https://central.sonatype.com/api/v1/publisher"
+
+                        snapshotSupported = true
+
+                        setAuthorization("BEARER")
+                        username = mavenCentralUsername
+                        password = mavenCentralPasswordToken
+
+                        stagingRepository("build/staging-deploy")
+
+                        connectTimeout = 20
+                        readTimeout = 60
+                        sign = false
+
+                        verifyUrl = "https://repo1.maven.org/maven2/{{path}}/{{filename}}"
+                        namespace = "io.github.damirdenis-tudor"
+
+                        retryDelay = 60
+                        maxRetries = 100
+                    }
+                }
+            }
+        }
     }
 }
