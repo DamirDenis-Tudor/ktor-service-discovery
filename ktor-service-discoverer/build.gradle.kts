@@ -80,7 +80,7 @@ publishing {
                 scm {
                     connection.set("scm:git:https://github.com/DamirDenis-Tudor/ktor-service-discovery.git")
                     developerConnection.set("scm:git:git@github.com:DamirDenis-Tudor/ktor-service-discovery.git")
-                    url.set("https://github.com/DamirDenis-Tudor/ktor-service-discovery/tree/main/ktor-service-discoverer")
+                    url.set("https://github.com/DamirDenis-Tudor/ktor-service-discovery")
                 }
 
                 licenses {
@@ -134,7 +134,7 @@ jreleaser {
                         username = mavenCentralUsername
                         password = mavenCentralPasswordToken
 
-                        stagingRepository("build/staging-deploy")
+                        stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.toPath().toString())
 
                         connectTimeout = 20
                         readTimeout = 60
