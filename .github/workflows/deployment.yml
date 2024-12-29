@@ -6,6 +6,7 @@ on:
       - closed
     branches:
       - main
+    title: ^(\d+)\.(\d+)\.(\d+)$
 
 jobs:
   create-github-release:
@@ -20,7 +21,7 @@ jobs:
       - name: Update
         run: |
           ./gradlew jreleaserRelease \
-              -PreleaseVersion="${{ github.event.release.tag_name }}" \
+              -PreleaseVersion="${{ github.event.pull_request.title }}" \
               -PgithubToken="${{ secrets.GITHUB_TOKEN }}"
 
   maven-deploy:
@@ -40,7 +41,7 @@ jobs:
       - name: Prepare ${{ matrix.subproject }} for publish
         run: |
           ./gradlew ${{ matrix.subproject }}:publish \
-            -PreleaseVersion="${{ github.event.release.tag_name }}" \
+            -PreleaseVersion="${{ github.event.pull_request.title }}" \
             -Psigning.keyId="${{ secrets.SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SIGNING_PASSWORD }}" \
             -Psigning.secretKeyRingFile="${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}"
@@ -48,7 +49,7 @@ jobs:
       - name: Deploy ${{ matrix.subproject }} in Maven Central
         run: |
           ./gradlew ${{ matrix.subproject }}:jreleaserDeploy \
-            -PreleaseVersion="${{ github.event.release.tag_name }}" \
+            -PreleaseVersion="${{ github.event.pull_request.title }}" \
             -PmavenCentralUsername="${{ secrets.MAVEN_CENTRAL_USERNAME }}" \
             -PmavenCentralPasswordToken="${{ secrets.MAVEN_CENTRAL_PASSWORD_TOKEN }}"
 
