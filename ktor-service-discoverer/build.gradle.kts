@@ -18,7 +18,6 @@ version = project.findProperty("releaseVersion") ?: "1.0.0"
 
 val mavenCentralUsername = project.findProperty("mavenCentralUsername")?.toString() ?: ""
 val mavenCentralPasswordToken = project.findProperty("mavenCentralPasswordToken")?.toString() ?: ""
-val githubToken = project.findProperty("githubToken")?.toString() ?: "no_blank"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -65,6 +64,8 @@ publishing {
         create<MavenPublication>("kotlin") {
             groupId = project.group.toString()
             artifactId = project.name
+            version = project.version.toString()
+
             from(components["java"])
 
             artifact(tasks["kotlinSourcesJar"])
@@ -112,40 +113,39 @@ signing {
 }
 
 jreleaser {
-    release {
-        github {
-            token = githubToken
-        }
+    deploy {
+        layout.buildDirectory.dir("jreleaser").get().asFile.mkdir()
+
         project {
-            name = "ktor-service-discoverer"
-            description.set("Ktor Service Discoverer plugin")
+            name = "ktor-service-discovery"
+            description.set("Ktor Service Discovery")
             copyright.set("Damir Denis-Tudor")
         }
-        deploy {
-            maven {
-                mavenCentral {
-                    create("sonatype") {
-                        active = Active.RELEASE
-                        url = "https://central.sonatype.com/api/v1/publisher"
 
-                        snapshotSupported = true
+        maven {
+            mavenCentral {
+                create("sonatype") {
 
-                        setAuthorization("BEARER")
-                        username = mavenCentralUsername
-                        password = mavenCentralPasswordToken
+                    active = Active.ALWAYS
+                    url = "https://central.sonatype.com/api/v1/publisher"
 
-                        stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.toPath().toString())
+                    snapshotSupported = true
 
-                        connectTimeout = 20
-                        readTimeout = 60
-                        sign = false
+                    setAuthorization("BEARER")
+                    username = mavenCentralUsername
+                    password = mavenCentralPasswordToken
 
-                        verifyUrl = "https://repo1.maven.org/maven2/{{path}}/{{filename}}"
-                        namespace = "io.github.damirdenis-tudor"
+                    stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.toPath().toString())
 
-                        retryDelay = 60
-                        maxRetries = 100
-                    }
+                    connectTimeout = 20
+                    readTimeout = 60
+                    sign = false
+
+                    verifyUrl = "https://repo1.maven.org/maven2/{{path}}/{{filename}}"
+                    namespace = "io.github.damirdenis-tudor"
+
+                    retryDelay = 60
+                    maxRetries = 100
                 }
             }
         }
