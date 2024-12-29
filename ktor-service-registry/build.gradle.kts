@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.assign
 import org.jreleaser.model.Active
 
 val ktorVersion: String by project
@@ -18,7 +19,6 @@ version = project.findProperty("releaseVersion") ?: "1.0.0"
 
 val mavenCentralUsername = project.findProperty("mavenCentralUsername")?.toString() ?: ""
 val mavenCentralPasswordToken = project.findProperty("mavenCentralPasswordToken")?.toString() ?: ""
-val githubToken = project.findProperty("githubToken")?.toString() ?: "no_blank"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -64,8 +64,10 @@ tasks.register<Jar>("javadocJar") {
 publishing {
     publications {
         create<MavenPublication>("kotlin") {
-            groupId = "io.github.damirdenis-tudor"
-            artifactId = "ktor-service-registry"
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
             version = project.version.toString()
             from(components["java"])
 
@@ -82,7 +84,7 @@ publishing {
                 scm {
                     connection.set("scm:git:https://github.com/DamirDenis-Tudor/ktor-server-discovery.git")
                     developerConnection.set("scm:git:git@github.com:DamirDenis-Tudor/ktor-server-discovery.git")
-                    url.set("https://github.com/DamirDenis-Tudor/ktor-service-discovery")
+                    url.set("https://github.com/DamirDenis-Tudor/ktor-service-discovery/tree/main/ktor-service-registry")
                 }
 
                 licenses {
@@ -102,43 +104,49 @@ publishing {
             }
         }
     }
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications["kotlin"])
 }
 
 jreleaser {
-    release {
-        github {
-            token = githubToken
-        }
+    deploy {
+        layout.buildDirectory.dir("jreleaser").get().asFile.mkdir()
+
         project {
-            name = "ktor-service-registry"
-            description.set("Ktor Service Registry plugin")
+            name = "ktor-service-discovery"
+            description.set("Ktor Service Discovery")
             copyright.set("Damir Denis-Tudor")
         }
-        deploy {
-            maven {
-                mavenCentral {
-                    create("sonatype") {
-                        active = Active.RELEASE
-                        url = "https://central.sonatype.com/api/v1/publisher"
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active = Active.ALWAYS
+                    url = "https://central.sonatype.com/api/v1/publisher"
 
-                        snapshotSupported = true
+                    snapshotSupported = true
 
-                        setAuthorization("BEARER")
-                        username = mavenCentralUsername
-                        password = mavenCentralPasswordToken
+                    setAuthorization("BEARER")
+                    username = mavenCentralUsername
+                    password = mavenCentralPasswordToken
 
-                        stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.toPath().toString())
+                    stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.toPath().toString())
 
-                        connectTimeout = 20
-                        readTimeout = 60
-                        sign = false
+                    connectTimeout = 20
+                    readTimeout = 60
+                    sign = false
 
-                        verifyUrl = "https://repo1.maven.org/maven2/{{path}}/{{filename}}"
-                        namespace = "io.github.damirdenis-tudor"
+                    verifyUrl = "https://repo1.maven.org/maven2/{{path}}/{{filename}}"
+                    namespace = "io.github.damirdenis-tudor"
 
-                        retryDelay = 60
-                        maxRetries = 100
-                    }
+                    retryDelay = 60
+                    maxRetries = 100
                 }
             }
         }
