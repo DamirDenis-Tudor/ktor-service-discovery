@@ -8,5 +8,6 @@ data class Service(
     val identity: String,
     val rootAddress: String,
     val timeToLive: Long,
+    val metadata: Map<String, String> = emptyMap(),
     val timeStarted: Long = System.currentTimeMillis(),
 )
