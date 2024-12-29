@@ -7,4 +7,5 @@ data class Service(
     val pattern: String,
     val identity: String,
     val rootAddress: String,
+    val metadata: Map<String, String> = emptyMap(),
 )
