@@ -13,7 +13,7 @@ plugins {
     id("signing")
 }
 
-group = "io.github.damir.denis.tudor.ktor.service"
+group = "io.github.damirdenis-tudor"
 version = project.findProperty("releaseVersion") ?: "1.0.0"
 
 val mavenCentralUsername = project.findProperty("mavenCentralUsername")?.toString() ?: ""
