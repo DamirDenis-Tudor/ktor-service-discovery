@@ -18,13 +18,25 @@ jreleaser {
     release {
         github {
             token = githubToken
+
+            changelog.append {
+                title = "### Maven central links"
+
+                content = """
+                    - [ktor-service-registry](https://central.sonatype.com/artifact/io.github.damirdenis-tudor/ktor-service-registry/${version})
+                    - [ktor-service-discoverer](https://central.sonatype.com/artifact/io.github.damirdenis-tudor/ktor-service-discoverer/${version})
+                    - [ktor-service-discoverable](https://central.sonatype.com/artifact/io.github.damirdenis-tudor/ktor-service-discoverer/${version})
+                """.trimIndent()
+            }
         }
+
         project {
             name = "ktor-service-discovery"
             description.set("Ktor Service Discovery")
             copyright.set("Damir Denis-Tudor")
         }
-        deploy{
+
+        deploy {
             active = Active.NEVER
         }
     }
