@@ -2,7 +2,7 @@ package io.github.damir.denis.tudor.ktor.registry.plugin
 
 import io.ktor.server.config.*
 
-class Config(config: ApplicationConfig) {
+class DiscovererConfig(config: ApplicationConfig) {
     var serviceRegistryHostname = config.tryGetString("serviceRegistryHostname") ?: ""
     var serviceRegistryPort = config.tryGetString("serviceRegistryPort")?.toIntOrNull() ?: ""
     var servicesInvalidationInterval = config.tryGetString("servicesInvalidationInterval")?.toLongOrNull() ?: 0

@@ -11,7 +11,7 @@ val LoadBalancerKey = AttributeKey<LoadBalancer>("LoadBalancerKey")
 val Discoverer = createApplicationPlugin(
     name = "Discoverer",
     configurationPath = "ktor.discoverer",
-    createConfiguration = ::Config
+    createConfiguration = ::DiscovererConfig
 ) {
     pluginConfig.validate()
     with(Discoverer(pluginConfig)) {

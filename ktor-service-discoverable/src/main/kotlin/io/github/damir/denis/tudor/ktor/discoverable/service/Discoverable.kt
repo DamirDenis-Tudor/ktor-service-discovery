@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.discoverable.service
 
-import io.github.damir.denis.tudor.ktor.discoverable.plugin.Config
+import io.github.damir.denis.tudor.ktor.discoverable.plugin.DiscovererConfig
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 class Discoverable(
     private val port: Int,
     private val hostname: String,
-    private val config: Config
+    private val discovererConfig: DiscovererConfig
 ) {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
@@ -25,20 +25,21 @@ class Discoverable(
         CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
                 val service = Service(
-                    pattern = config.servicePattern,
-                    identity = config.serviceIdentity,
+                    pattern = discovererConfig.servicePattern,
+                    identity = discovererConfig.serviceIdentity,
                     rootAddress = "http://$hostname:$port",
-                    timeToLive = config.timeToLiveInterval,
+                    timeToLive = discovererConfig.timeToLiveInterval,
+                    metadata = discovererConfig.serviceMetadata
                 )
 
                 logger.debug("Perform heartbeat discovery: service={}", service)
 
-                httpClient.request("http://${config.serviceRegistryHostname}:${config.serviceRegistryPort}/register") {
+                httpClient.request("http://${discovererConfig.serviceRegistryHostname}:${discovererConfig.serviceRegistryPort}/register") {
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
                     body = Json.encodeToString(service)
                 }
-                delay(config.heartbeatInterval * 1_000)
+                delay(discovererConfig.heartbeatInterval * 1_000)
             }
         }
     }

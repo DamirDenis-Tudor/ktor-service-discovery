@@ -18,17 +18,17 @@ val ServiceRegistryKey = AttributeKey<ServiceRegistry>("ServiceRegistry")
 val Registry = createApplicationPlugin(
     name = "Registry",
     configurationPath = "ktor.registry",
-    createConfiguration = ::Config
+    createConfiguration = ::RegistryConfig
 ) {
     pluginConfig.validate()
 
-    ActionHandler.config = pluginConfig
+    ActionHandler.registryConfig = pluginConfig
     ActionHandler.port = applicationConfig.port
 
-    PeerRegistry.config = pluginConfig
+    PeerRegistry.registryConfig = pluginConfig
     PeerRegistry.host = applicationConfig.host
 
-    ServiceRegistry.config = pluginConfig
+    ServiceRegistry.registryConfig = pluginConfig
 
     application.attributes.put(ServiceRegistryKey, ServiceRegistry())
 

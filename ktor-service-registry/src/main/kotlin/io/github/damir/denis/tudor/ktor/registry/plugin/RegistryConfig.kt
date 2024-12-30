@@ -2,7 +2,7 @@ package io.github.damir.denis.tudor.ktor.registry.plugin
 
 import io.ktor.server.config.*
 
-class Config(config: ApplicationConfig) {
+class RegistryConfig(config: ApplicationConfig) {
     var gossipFanout = config.tryGetString("gossipFanout")?.toIntOrNull() ?: 0
     var gossipActionTimeout = config.tryGetString("gossipActionTimeout")?.toLongOrNull() ?: 0
 
