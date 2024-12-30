@@ -2,7 +2,7 @@ package io.github.damir.denis.tudor.ktor.registry.service
 
 import io.github.damir.denis.tudor.ktor.registry.gossip.Action
 import io.github.damir.denis.tudor.ktor.registry.gossip.ActionHandler
-import io.github.damir.denis.tudor.ktor.registry.plugin.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.RegistryConfig
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -16,7 +16,7 @@ class ServiceRegistry {
 
     companion object {
         private val mutex = Mutex()
-        lateinit var config: Config
+        lateinit var registryConfig: RegistryConfig
     }
 
     private fun Service.isExpired(): Boolean = System.currentTimeMillis() - timeStarted >= (timeToLive * 1_000)
@@ -25,7 +25,7 @@ class ServiceRegistry {
         CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
                 mutex.withLock {
-                    delay(config.registryCleanUpInterval * 1_000)
+                    delay(registryConfig.registryCleanUpInterval * 1_000)
 
                     logger.debug("Performing registry clean up.")
 

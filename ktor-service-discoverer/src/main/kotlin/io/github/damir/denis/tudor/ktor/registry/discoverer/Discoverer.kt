@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.discoverer
 
-import io.github.damir.denis.tudor.ktor.registry.plugin.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.DiscovererConfig
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -9,7 +9,7 @@ import io.ktor.http.*
 import io.ktor.util.logging.*
 import kotlinx.serialization.json.Json
 
-class Discoverer(private val config: Config) {
+class Discoverer(private val discovererConfig: DiscovererConfig) {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
     private val httpClient = HttpClient(CIO)
@@ -18,14 +18,14 @@ class Discoverer(private val config: Config) {
     private val servicesCache: MutableMap<String, List<Service>> = mutableMapOf()
 
     private fun Long.hasExpired(): Boolean {
-        return (System.currentTimeMillis() - this) > (config.servicesInvalidationInterval * 1_000)
+        return (System.currentTimeMillis() - this) > (discovererConfig.servicesInvalidationInterval * 1_000)
     }
 
     private val json = Json { ignoreUnknownKeys = true }
 
     private suspend fun fetchServices(pattern: String): List<Service> {
         val response =
-            httpClient.request("http://${config.serviceRegistryHostname}:${config.serviceRegistryPort}/services/$pattern") {
+            httpClient.request("http://${discovererConfig.serviceRegistryHostname}:${discovererConfig.serviceRegistryPort}/services/$pattern") {
                 method = HttpMethod.Get
                 contentType(ContentType.Application.Json)
             }.bodyAsText()

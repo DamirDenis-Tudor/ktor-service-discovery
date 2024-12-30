@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.gossip
 
-import io.github.damir.denis.tudor.ktor.registry.plugin.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.RegistryConfig
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -30,7 +30,7 @@ class ActionHandler {
 
     companion object {
         var port: Int by Delegates.notNull()
-        lateinit var config: Config
+        lateinit var registryConfig: RegistryConfig
     }
 
     init {
@@ -44,7 +44,7 @@ class ActionHandler {
             while (isActive) {
                 mutex.withLock {
                     actionCycleCounts.filter { (action, _) ->
-                        action.isExpired(config.gossipActionTimeout)
+                        action.isExpired(registryConfig.gossipActionTimeout)
                     }.keys.forEach { action ->
                         actionCycleCounts.remove(action)
                         logger.debug("Removed expired action <{}>.", action)
@@ -80,7 +80,7 @@ class ActionHandler {
 
     @OptIn(InternalAPI::class)
     private suspend fun handleRegisterService(action: Action.RegisterService) {
-        peerRegistry.peers.shuffled().take(config.gossipFanout).forEach { peer ->
+        peerRegistry.peers.shuffled().take(registryConfig.gossipFanout).forEach { peer ->
             runCatching {
                 httpClient.request("http://$peer:$port/register") {
                     method = HttpMethod.Post
@@ -97,7 +97,7 @@ class ActionHandler {
 
     @OptIn(InternalAPI::class)
     private suspend fun handleUnregisterService(action: Action.UnregisterService) {
-        peerRegistry.peers.shuffled().take(config.gossipFanout).forEach { peer ->
+        peerRegistry.peers.shuffled().take(registryConfig.gossipFanout).forEach { peer ->
             runCatching {
                 httpClient.request("http://$peer:$port/unregister") {
                     method = HttpMethod.Post

@@ -3,7 +3,7 @@ package io.github.damir.denis.tudor.ktor.discoverable.plugin
 import io.ktor.server.config.*
 
 
-class Config(config: ApplicationConfig) {
+class DiscovererConfig(config: ApplicationConfig) {
     var heartbeatInterval = config.tryGetString("heartbeatInterval")?.toLongOrNull() ?: 0
     var timeToLiveInterval = config.tryGetString("timeToLiveInterval")?.toLongOrNull() ?: 0
 
@@ -12,6 +12,8 @@ class Config(config: ApplicationConfig) {
 
     var servicePattern = config.tryGetString("servicePattern") ?: ""
     var serviceIdentity = config.tryGetString("serviceIdentity") ?: ""
+
+    var serviceMetadata: Map<String, String> = emptyMap()
 
     fun validate() {
         require(heartbeatInterval > 0) { "heartbeatInterval must be greater than zero" }

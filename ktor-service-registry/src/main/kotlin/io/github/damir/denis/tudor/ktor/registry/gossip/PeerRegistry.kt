@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.gossip
 
-import io.github.damir.denis.tudor.ktor.registry.plugin.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.RegistryConfig
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -25,15 +25,15 @@ class PeerRegistry {
 
     companion object {
         lateinit var host: String
-        lateinit var config: Config
+        lateinit var registryConfig: RegistryConfig
     }
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
-                delay(config.peersInitialDelay * 1_000)
+                delay(registryConfig.peersInitialDelay * 1_000)
                 updatePeers()
-                delay(config.peersDiscoveryInterval * 1_000)
+                delay(registryConfig.peersDiscoveryInterval * 1_000)
             }
         }
     }
@@ -42,7 +42,7 @@ class PeerRegistry {
         peersMutex.withLock {
             mutablePeers = resolvePeers()
             convergence = calculateConvergenceRate()
-            logger.trace("Expected convergence in $convergence cycles - fanout: ${config.gossipFanout}, peers: ${mutablePeers.count()}.")
+            logger.trace("Expected convergence in $convergence cycles - fanout: ${registryConfig.gossipFanout}, peers: ${mutablePeers.count()}.")
         }
     }
 
@@ -50,7 +50,7 @@ class PeerRegistry {
         InetAddress.getByName(host)
             .let { address ->
                 runCatching {
-                    InetAddress.getAllByName(config.registryDnsPattern)
+                    InetAddress.getAllByName(registryConfig.registryDnsPattern)
                         .map { it.hostAddress }
                         .filter { it != address.hostAddress }
                         .toMutableSet()
@@ -65,8 +65,8 @@ class PeerRegistry {
 
     private fun calculateConvergenceRate(): Long {
         if (mutablePeers.isEmpty()) return 0
-        else if(mutablePeers.size <= config.gossipFanout) return 1
+        else if(mutablePeers.size <= registryConfig.gossipFanout) return 1
 
-        return ceil(ln(mutablePeers.size.toDouble()) / ln(config.gossipFanout.toDouble())).toLong()
+        return ceil(ln(mutablePeers.size.toDouble()) / ln(registryConfig.gossipFanout.toDouble())).toLong()
     }
 }
