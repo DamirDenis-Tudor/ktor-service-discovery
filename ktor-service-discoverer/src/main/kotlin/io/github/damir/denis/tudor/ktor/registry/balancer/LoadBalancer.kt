@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.registry.balancer
 
-import io.github.damir.denis.tudor.ktor.registry.plugin.Config
+import io.github.damir.denis.tudor.ktor.registry.plugin.DiscovererConfig
 import io.github.damir.denis.tudor.ktor.registry.discoverer.Discoverer
 import io.github.damir.denis.tudor.ktor.registry.discoverer.Service
 import io.ktor.client.*
@@ -11,11 +11,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.system.measureTimeMillis
 
-class LoadBalancer(private val config: Config) {
+class LoadBalancer(private val discovererConfig: DiscovererConfig) {
     private val httpClient = HttpClient(CIO)
 
     private val mutex = Mutex()
-    private val serviceDiscoverer = Discoverer(config)
+    private val serviceDiscoverer = Discoverer(discovererConfig)
 
     private val roundRobinMetadata: MutableMap<String, RoundRobinMetadata> = mutableMapOf()
     private val leastConnMetadata: MutableMap<String, MutableMap<Service, LeastConnectionsMetadata>> = mutableMapOf()

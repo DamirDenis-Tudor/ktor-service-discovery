@@ -12,7 +12,7 @@ val DiscoverableKey = AttributeKey<Discoverable>("DiscoverableKey")
 val Discoverable = createApplicationPlugin(
     name = "Discoverable",
     configurationPath = "ktor.discoverable",
-    createConfiguration = ::Config
+    createConfiguration = ::DiscovererConfig
 ) {
     pluginConfig.validate()
 
@@ -21,7 +21,7 @@ val Discoverable = createApplicationPlugin(
         Discoverable(
             port = applicationConfig.port,
             hostname = applicationConfig.host,
-            config = pluginConfig
+            discovererConfig = pluginConfig
         )
     )
 
