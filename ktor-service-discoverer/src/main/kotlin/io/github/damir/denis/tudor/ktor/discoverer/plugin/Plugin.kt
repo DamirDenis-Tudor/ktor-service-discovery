@@ -1,7 +1,7 @@
-package io.github.damir.denis.tudor.ktor.registry.plugin
+package io.github.damir.denis.tudor.ktor.discoverer.plugin
 
-import io.github.damir.denis.tudor.ktor.registry.balancer.LoadBalancer
-import io.github.damir.denis.tudor.ktor.registry.discoverer.Discoverer
+import io.github.damir.denis.tudor.ktor.discoverer.balancer.LoadBalancer
+import io.github.damir.denis.tudor.ktor.discoverer.discoverer.Discoverer
 import io.ktor.server.application.*
 import io.ktor.util.*
 

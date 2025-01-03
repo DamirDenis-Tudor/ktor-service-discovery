@@ -1,4 +1,4 @@
-package io.github.damir.denis.tudor.ktor.registry.discoverer
+package io.github.damir.denis.tudor.ktor.discoverer.discoverer
 
 import kotlinx.serialization.Serializable
 

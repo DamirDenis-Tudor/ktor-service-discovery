@@ -1,4 +1,4 @@
-package io.github.damir.denis.tudor.ktor.registry.balancer
+package io.github.damir.denis.tudor.ktor.discoverer.balancer
 
 enum class LoadBalanceMethod{
     RoundRobin,
