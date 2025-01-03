@@ -1,17 +1,16 @@
-package io.github.damir.denis.tudor.ktor.registry
+package io.github.damir.denis.tudor.ktor.discoverer
 
-import io.github.damir.denis.tudor.ktor.registry.balancer.LoadBalanceMethod
-import io.github.damir.denis.tudor.ktor.registry.plugin.Discoverer
-import io.github.damir.denis.tudor.ktor.registry.plugin.request
+import io.github.damir.denis.tudor.ktor.discoverer.plugin.Discoverer
+import io.github.damir.denis.tudor.ktor.discoverer.plugin.request
 import io.ktor.http.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.*
 
-fun main(args: Array<String>) {
+internal fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
-fun Application.module() {
+internal fun Application.module() {
     install(Discoverer)
 
     CoroutineScope(Dispatchers.IO).launch {
