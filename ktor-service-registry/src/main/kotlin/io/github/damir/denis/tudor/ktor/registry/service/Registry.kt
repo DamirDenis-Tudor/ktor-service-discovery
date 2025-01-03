@@ -12,9 +12,9 @@ internal data class Registry(private val immutableServices: Map<String, List<Ser
         return Registry(immutableServices + (service.pattern to updatedPatternServices))
     }
 
-    operator fun minus(service: Service): Registry {
+    fun remove(pattern: String, id: String): Registry {
         val updatedServices = immutableServices.mapValues { (_, patternServices) ->
-            patternServices.filterNot { it.identity == service.identity }
+            patternServices.filterNot { it.identity == id && it.pattern == pattern }
         }.filter { it.value.isNotEmpty() }
 
         return Registry(updatedServices)

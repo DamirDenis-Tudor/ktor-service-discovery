@@ -16,19 +16,22 @@ fun Application.module() {
 
     CoroutineScope(Dispatchers.IO).launch {
         repeat(100) {
-            delay(1000)
             async {
-                println("call $it")
                 request(
                     endpoint = "/ping",
-                    serviceName = "test",
-                    loadBalanceMethod = LoadBalanceMethod.LowestLatency
+                    serviceName = "test"
                 ) {
                     method = HttpMethod.Get
-                }.let { println(it) }
+                }.fold(
+                    onSuccess = { response ->
+                        environment.log.info("Request successful: ${response.status}")
+                    },
+                    onFailure = { exception ->
+                    }
+                )
             }
 
-            delay(100)
+            delay(1000)
         }
     }
 }
