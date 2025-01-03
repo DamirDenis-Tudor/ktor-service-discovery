@@ -47,11 +47,11 @@ class ServiceRegistry {
     }
 
 
-    suspend fun removeService(service: Service) {
-        logger.debug("Removed service {}", service)
+    suspend fun removeService(pattern: String, id: String) {
+        logger.debug("Removed service {} with id {}", pattern, id)
 
-        registry -= service
-        actionHandler.publishAction(Action.UnregisterService(service))
+        registry = registry.remove(pattern, id)
+        actionHandler.publishAction(Action.UnregisterService(pattern, id))
     }
 
     fun getServices(pattern: String) = registry[pattern]

@@ -10,8 +10,4 @@ internal fun main(args: Array<String>) {
 
 internal fun Application.module() {
     install(Discoverable)
-
-    routing {
-
-    }
 }

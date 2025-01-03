@@ -26,12 +26,12 @@ class Discoverable(
 
     private val httpClient = HttpClient(CIO)
     private val registryAddress = "http://${discovererConfig.serviceRegistryHostname}:" +
-                "${discovererConfig.serviceRegistryPort}/register"
+                "${discovererConfig.serviceRegistryPort}"
 
     init {
         fixedRateTimer(
             name = "heartbeat",
-            initialDelay = 5_000,
+            initialDelay = 1_000,
             period = discovererConfig.heartbeatInterval * 1_000
         ) {
             val service = Service(
@@ -47,7 +47,7 @@ class Discoverable(
             CoroutineScope(Dispatchers.IO).launch {
                 flow {
                     emit(
-                        httpClient.request(registryAddress) {
+                        httpClient.request("$registryAddress/register") {
                             method = HttpMethod.Post
                             contentType(ContentType.Application.Json)
                             body = Json.encodeToString(service)
@@ -57,7 +57,7 @@ class Discoverable(
                     (e is IOException)
                         .also { logger.warn("Exception during heartbeat discovery: {}", e.message) }
                         .also { logger.warn(e.stackTraceToString()) }
-                        .also { if (it) delay(5 * 1_000) }
+                        .also { if (it) delay(discovererConfig.serviceRegistryRetryInterval * 1_000) }
                 }.collect()
             }
         }

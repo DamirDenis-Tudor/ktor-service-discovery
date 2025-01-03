@@ -11,7 +11,7 @@ suspend fun Application.request(
     serviceName: String,
     loadBalanceMethod: LoadBalanceMethod = LoadBalanceMethod.RoundRobin,
     block: HttpRequestBuilder.() -> Unit = {}
-): HttpResponse {
+): Result<HttpResponse> {
     return attributes[LoadBalancerKey].request(endpoint, serviceName, loadBalanceMethod, block)
 }
 
