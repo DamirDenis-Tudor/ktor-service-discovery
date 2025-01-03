@@ -49,11 +49,12 @@ val Registry = createApplicationPlugin(
                 .apply { registry.addService(this) }
         }
 
-        post("/unregister") {
+        post("/unregister/{pattern}/{id}") {
             call.respond(HttpStatusCode.OK)
-            call.receiveText()
-                .let { Json.decodeFromString<Service>(it) }
-                .apply { registry.removeService(this) }
+            registry.removeService(
+                pattern = call.parameters["pattern"] ?: "",
+                id = call.parameters["id"] ?: ""
+            )
         }
     }
 }

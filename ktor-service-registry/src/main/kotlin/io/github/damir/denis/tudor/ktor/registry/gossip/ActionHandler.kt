@@ -99,10 +99,9 @@ class ActionHandler {
     private suspend fun handleUnregisterService(action: Action.UnregisterService) {
         peerRegistry.peers.shuffled().take(registryConfig.gossipFanout).forEach { peer ->
             runCatching {
-                httpClient.request("http://$peer:$port/unregister") {
+                httpClient.request("http://$peer:$port/unregister/${action.pattern}/${action.id}") {
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
-                    body = Json.encodeToString(action.service)
                 }
             }.onSuccess {
                 logger.debug("Successfully sent UnregisterService action to peer <{}>.", peer)

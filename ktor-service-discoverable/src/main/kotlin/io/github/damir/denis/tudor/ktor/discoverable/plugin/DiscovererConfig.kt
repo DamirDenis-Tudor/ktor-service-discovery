@@ -9,6 +9,7 @@ class DiscovererConfig(config: ApplicationConfig) {
 
     var serviceRegistryHostname = config.tryGetString("serviceRegistryHostname") ?: ""
     var serviceRegistryPort = config.tryGetString("serviceRegistryPort")?.toIntOrNull() ?: 0
+    var serviceRegistryRetryInterval = config.tryGetString("serviceRegistryRetryInterval")?.toLongOrNull() ?: 5L
 
     var servicePattern = config.tryGetString("servicePattern") ?: ""
     var serviceIdentity = config.tryGetString("serviceIdentity") ?: ""

@@ -2,6 +2,7 @@ package io.github.damir.denis.tudor.ktor.registry.gossip
 
 import io.github.damir.denis.tudor.ktor.registry.service.Service
 import kotlinx.serialization.Serializable
+import org.intellij.lang.annotations.Pattern
 
 @Serializable
 sealed class Action {
@@ -13,5 +14,5 @@ sealed class Action {
     data class RegisterService(val service: Service) : Action()
 
     @Serializable
-    data class UnregisterService(val service: Service) : Action()
+    data class UnregisterService(val pattern: String, val id: String) : Action()
 }
