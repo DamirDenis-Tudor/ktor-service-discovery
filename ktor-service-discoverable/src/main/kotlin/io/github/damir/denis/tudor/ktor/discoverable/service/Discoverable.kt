@@ -8,8 +8,13 @@ import io.ktor.http.*
 import io.ktor.util.logging.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.retry
+import kotlinx.io.IOException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.concurrent.fixedRateTimer
 
 @OptIn(InternalAPI::class)
 class Discoverable(
@@ -20,26 +25,40 @@ class Discoverable(
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
     private val httpClient = HttpClient(CIO)
+    private val registryAddress = "http://${discovererConfig.serviceRegistryHostname}:" +
+                "${discovererConfig.serviceRegistryPort}/register"
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
-            while (isActive) {
-                val service = Service(
-                    pattern = discovererConfig.servicePattern,
-                    identity = discovererConfig.serviceIdentity,
-                    rootAddress = "http://$hostname:$port",
-                    timeToLive = discovererConfig.timeToLiveInterval,
-                    metadata = discovererConfig.serviceMetadata
-                )
+        fixedRateTimer(
+            name = "heartbeat",
+            initialDelay = 5_000,
+            period = discovererConfig.heartbeatInterval * 1_000
+        ) {
+            val service = Service(
+                pattern = discovererConfig.servicePattern,
+                identity = discovererConfig.serviceIdentity,
+                rootAddress = "http://$hostname:$port",
+                timeToLive = discovererConfig.timeToLiveInterval,
+                metadata = discovererConfig.serviceMetadata
+            )
 
-                logger.debug("Perform heartbeat discovery: service={}", service)
+            logger.debug("Perform heartbeat discovery: service={}", service)
 
-                httpClient.request("http://${discovererConfig.serviceRegistryHostname}:${discovererConfig.serviceRegistryPort}/register") {
-                    method = HttpMethod.Post
-                    contentType(ContentType.Application.Json)
-                    body = Json.encodeToString(service)
-                }
-                delay(discovererConfig.heartbeatInterval * 1_000)
+            CoroutineScope(Dispatchers.IO).launch {
+                flow {
+                    emit(
+                        httpClient.request(registryAddress) {
+                            method = HttpMethod.Post
+                            contentType(ContentType.Application.Json)
+                            body = Json.encodeToString(service)
+                        }
+                    )
+                }.retry { e ->
+                    (e is IOException)
+                        .also { logger.warn("Exception during heartbeat discovery: {}", e.message) }
+                        .also { logger.warn(e.stackTraceToString()) }
+                        .also { if (it) delay(5 * 1_000) }
+                }.collect()
             }
         }
     }
