@@ -1,4 +1,4 @@
-package io.github.damir.denis.tudor.ktor.registry.plugin
+package io.github.damir.denis.tudor.ktor.discoverer.plugin
 
 import io.ktor.server.config.*
 

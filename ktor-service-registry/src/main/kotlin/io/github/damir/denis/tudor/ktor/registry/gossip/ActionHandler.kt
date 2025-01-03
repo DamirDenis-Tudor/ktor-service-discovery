@@ -50,6 +50,7 @@ class ActionHandler {
                         logger.debug("Removed expired action <{}>.", action)
                     }
                 }
+                delay(registryConfig.registryCleanUpInterval * 1_000)
             }
         }
     }

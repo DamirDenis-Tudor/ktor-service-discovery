@@ -1,8 +1,8 @@
-package io.github.damir.denis.tudor.ktor.registry.balancer
+package io.github.damir.denis.tudor.ktor.discoverer.balancer
 
-import io.github.damir.denis.tudor.ktor.registry.discoverer.Discoverer
-import io.github.damir.denis.tudor.ktor.registry.discoverer.Service
-import io.github.damir.denis.tudor.ktor.registry.plugin.DiscovererConfig
+import io.github.damir.denis.tudor.ktor.discoverer.discoverer.Discoverer
+import io.github.damir.denis.tudor.ktor.discoverer.discoverer.Service
+import io.github.damir.denis.tudor.ktor.discoverer.plugin.DiscovererConfig
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
