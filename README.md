@@ -1,1 +1,1 @@
-![Deployment Status](https://img.shields.io/badge/deployment-success-green?style=flat)
+![Deployment Status](https://img.shields.io/badge/deployment-failed-red?style=flat)
