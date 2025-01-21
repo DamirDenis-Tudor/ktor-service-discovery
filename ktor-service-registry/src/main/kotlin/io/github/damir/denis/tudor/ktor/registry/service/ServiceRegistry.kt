@@ -22,7 +22,7 @@ class ServiceRegistry {
     private fun Service.isExpired(): Boolean = System.currentTimeMillis() - timeStarted >= (timeToLive * 1_000)
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             while (isActive) {
                 mutex.withLock {
                     delay(registryConfig.registryCleanUpInterval * 1_000)
@@ -45,7 +45,6 @@ class ServiceRegistry {
         registry += service
         actionHandler.publishAction(Action.RegisterService(service))
     }
-
 
     suspend fun removeService(pattern: String, id: String) {
         logger.debug("Removed service {} with id {}", pattern, id)
