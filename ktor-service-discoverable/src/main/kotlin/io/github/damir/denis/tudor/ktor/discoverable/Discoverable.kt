@@ -9,5 +9,19 @@ internal fun main(args: Array<String>) {
 }
 
 internal fun Application.module() {
-    install(Discoverable)
+    install(Discoverable){
+        heartbeatInterval = 10
+        timeToLiveInterval = 20
+
+        serviceRegistryHostname = "registry hostname"
+        serviceRegistryPort = 7000
+        serviceRegistryRetryInterval = 10
+
+        servicePattern = "service-pattern"
+        serviceIdentity = "unique-identifier"
+
+        serviceMetadata = mapOf(
+            "data1" to "value1",
+        )
+    }
 }
