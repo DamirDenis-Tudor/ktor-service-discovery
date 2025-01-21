@@ -1,1 +1,1 @@
-![Deployment Status](https://img.shields.io/badge/deployment-success-green?style=flat)
+![Deployment Status](https://github.com/DamirDenis-Tudor/ktor-service-discovery/actions/workflows/deployment.yml/badge.svg)

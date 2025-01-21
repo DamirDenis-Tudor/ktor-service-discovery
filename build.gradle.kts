@@ -19,14 +19,24 @@ jreleaser {
         github {
             token = githubToken
 
-            changelog.append {
-                title = "### Maven central links"
+            changelog {
+                enabled = true
+                setFormatted("ALWAYS")
+                preset = "conventional-commits"
+                extraProperties = mapOf("categorizeScopes" to true)
+                contributors {
+                    enabled = false
+                }
 
-                content = """
+                append {
+                    setTarget("build/jreleaser/release/CHANGELOG.md")
+                    enabled = true
+                    content = """
                     - [ktor-service-registry](https://central.sonatype.com/artifact/io.github.damirdenis-tudor/ktor-service-registry/${version})
                     - [ktor-service-discoverer](https://central.sonatype.com/artifact/io.github.damirdenis-tudor/ktor-service-discoverer/${version})
                     - [ktor-service-discoverable](https://central.sonatype.com/artifact/io.github.damirdenis-tudor/ktor-service-discoverer/${version})
                 """.trimIndent()
+                }
             }
         }
 
