@@ -8,5 +8,14 @@ internal fun main(args: Array<String>) {
 }
 
 internal fun Application.module() {
-    install(Registry)
+    install(Registry){
+        gossipFanout = 3
+        gossipActionTimeout = 60
+
+        peersInitialDelay = 5
+        peersDiscoveryInterval = 600
+
+        registryCleanUpInterval = 50
+        registryDnsPattern = "localhost"
+    }
 }
