@@ -7,6 +7,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.util.createLRUCache
 import io.ktor.util.logging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -78,18 +79,20 @@ class LoadBalancer(discovererConfig: DiscovererConfig) {
         endpoint: String,
         block: HttpRequestBuilder.() -> Unit
     ): HttpResponse {
-        val currentMetadata = mutex.withLock {
+        mutex.withLock {
             roundRobinMetadata.getOrPut(serviceName) { RoundRobinMetadata() }
-        }
-        currentMetadata.currentIndex = (currentMetadata.currentIndex + 1) % services.size
+        }.let { currentMetadata ->
+            currentMetadata.currentIndex = (currentMetadata.currentIndex + 1) % services.size
 
-        val service = services[currentMetadata.currentIndex]
-        try {
-            return httpClient.request(urlString = "${service.rootAddress}${endpoint}", block = block)
-        } catch (e: Exception) {
-            serviceDiscoverer.unregisterService(service)
-            roundRobinMetadata.remove(serviceName)
-            throw e
+            services[currentMetadata.currentIndex].let { service ->
+                return runCatching {
+                    httpClient.request(urlString = "${service.rootAddress}${endpoint}", block = block)
+                }.getOrElse {
+                    serviceDiscoverer.unregisterService(service)
+                    roundRobinMetadata.remove(serviceName)
+                    throw it
+                }
+            }
         }
     }
 
@@ -99,22 +102,22 @@ class LoadBalancer(discovererConfig: DiscovererConfig) {
         endpoint: String,
         block: HttpRequestBuilder.() -> Unit
     ): HttpResponse {
-        val service = mutex.withLock {
+        mutex.withLock {
             leastConnMetadata.getOrPut(serviceName) { mutableMapOf() }
             services.forEach { leastConnMetadata[serviceName]!!.getOrPut(it) { LeastConnectionsMetadata() } }
 
             leastConnMetadata[serviceName]!!.minBy { it.value.connections }.key
-        }
-
-        try {
-            mutex.withLock { leastConnMetadata[serviceName]!![service]!!.connections += 1 }
-            return httpClient.request(urlString = "${service.rootAddress}${endpoint}", block = block)
-        } catch (e: Exception) {
-            serviceDiscoverer.unregisterService(service)
-            leastConnMetadata.remove(serviceName)
-            throw e
-        } finally {
-            mutex.withLock { leastConnMetadata[serviceName]!![service]!!.connections -= 1 }
+        }.let { service ->
+            return try {
+                mutex.withLock { leastConnMetadata[serviceName]!![service]!!.connections += 1 }
+                return httpClient.request(urlString = "${service.rootAddress}${endpoint}", block = block)
+            } catch (error: Exception) {
+                serviceDiscoverer.unregisterService(service)
+                leastConnMetadata.remove(serviceName)
+                throw error
+            } finally {
+                mutex.withLock { leastConnMetadata[serviceName]!![service]!!.connections -= 1 }
+            }
         }
     }
 
@@ -124,22 +127,22 @@ class LoadBalancer(discovererConfig: DiscovererConfig) {
         endpoint: String,
         block: HttpRequestBuilder.() -> Unit
     ): HttpResponse {
-        val service = mutex.withLock {
+        mutex.withLock {
             lowestLatencyMetadata.getOrPut(serviceName) { mutableMapOf() }
 
             services.forEach { lowestLatencyMetadata[serviceName]!!.getOrPut(it) { LowestLatencyMetadata() } }
             lowestLatencyMetadata[serviceName]!!.minBy { it.value.latency }.key
-        }
+        }.let { service ->
+            runCatching {
+                val latency = measureTimeMillis { httpClient.get("${service.rootAddress}/ping") }
+                mutex.withLock { lowestLatencyMetadata[serviceName]?.let { it[service]?.latency = latency } }
 
-        try {
-            val latency = measureTimeMillis { httpClient.get("${service.rootAddress}/ping") }
-            mutex.withLock { lowestLatencyMetadata[serviceName]?.let { it[service]?.latency = latency } }
-
-            return httpClient.request(urlString = "${service.rootAddress}${endpoint}", block = block)
-        } catch (e: Exception) {
-            serviceDiscoverer.unregisterService(service)
-            lowestLatencyMetadata.remove(serviceName)
-            throw e
+                return httpClient.request(urlString = "${service.rootAddress}${endpoint}", block = block)
+            }.getOrElse {
+                serviceDiscoverer.unregisterService(service)
+                lowestLatencyMetadata.remove(serviceName)
+                throw it
+            }
         }
     }
 }
