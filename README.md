@@ -1,6 +1,6 @@
 <div align="center">
 
-# ![ktor-service-discovery](https://github.com/user-attachments/assets/960ba62b-b435-4df1-8602-c2f7257109a9) Ktor Service Discovery
+# ![logo(1)(1)](https://github.com/user-attachments/assets/fc0483f2-1e12-4f22-9caf-c3c49a8585bd)tor Service Discovery
 
 </div>
 
@@ -14,7 +14,7 @@
 
 ## Usage
 
-### Registry
+- ### Registry
 
 ```kotlin
 /* Plugin installation. */
@@ -29,7 +29,7 @@ install(Registry){
     registryDnsPattern = "<dns-hostname>"
 }
 ```
-### Discoverable
+- ### Discoverable
 
 ```kotlin
 /* Plugin installation. */
@@ -50,9 +50,7 @@ install(Discoverable){
 }
 ```
 
-### Discoverer
-
-- Install
+- ### Discoverer
 
 ```kotlin
 /* Plugin installation. */
@@ -62,8 +60,6 @@ install(Discoverer) {
     servicesInvalidationInterval = 30
 }
 ```
-
-- Requests
 
 ```kotlin
 /* Making requests with a load balancing method. */
