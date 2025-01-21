@@ -14,7 +14,7 @@ class DiscovererConfig(config: ApplicationConfig) {
     var servicePattern = config.tryGetString("servicePattern") ?: ""
     var serviceIdentity = config.tryGetString("serviceIdentity") ?: ""
 
-    var serviceMetadata: Map<String, String> = emptyMap()
+    var serviceMetadata: Map<String, String> = config.config("serviceMetadata").toMap() as Map<String, String> ?: emptyMap()
 
     fun validate() {
         require(heartbeatInterval > 0) { "heartbeatInterval must be greater than zero" }

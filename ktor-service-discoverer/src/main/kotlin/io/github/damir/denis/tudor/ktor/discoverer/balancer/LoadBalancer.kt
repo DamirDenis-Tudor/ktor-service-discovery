@@ -17,7 +17,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
-class LoadBalancer(private val discovererConfig: DiscovererConfig) {
+class LoadBalancer(discovererConfig: DiscovererConfig) {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
     private val httpClient = HttpClient(CIO)
@@ -61,15 +61,15 @@ class LoadBalancer(private val discovererConfig: DiscovererConfig) {
                             TODO()
                         }
                     }
-                }.also { response ->
-                    logger.debug("Calling url <{}>.", response.request.url)
-                }.apply { emit(this@apply) }
+                }.also {
+                    logger.debug("Calling url <{}>.", it.request.url)
+                }.apply {
+                    emit(this@apply)
+                }
             }
         }.retry { e ->
             e !is IllegalStateException
         }.first()
-    }.also { response ->
-
     }
 
     private suspend fun handleRoundRobin(
