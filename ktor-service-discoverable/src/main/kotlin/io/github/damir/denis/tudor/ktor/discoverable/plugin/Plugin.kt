@@ -12,15 +12,14 @@ val DiscoverableKey = AttributeKey<Discoverable>("DiscoverableKey")
 val Discoverable = createApplicationPlugin(
     name = "Discoverable",
     configurationPath = "ktor.discoverable",
-    createConfiguration = ::DiscovererConfig
+    createConfiguration = ::Config
 ) {
     pluginConfig.validate()
 
     application.attributes.put(
         DiscoverableKey,
         Discoverable(
-            port = applicationConfig.port,
-            hostname = applicationConfig.host,
+            serviceAddress = "http://${applicationConfig.host}:${applicationConfig.port}",
             discovererConfig = pluginConfig
         )
     )
