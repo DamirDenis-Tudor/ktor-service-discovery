@@ -1,6 +1,6 @@
 package io.github.damir.denis.tudor.ktor.discoverable.service
 
-import io.github.damir.denis.tudor.ktor.discoverable.plugin.DiscovererConfig
+import io.github.damir.denis.tudor.ktor.discoverable.plugin.Config
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -18,9 +18,8 @@ import kotlin.concurrent.fixedRateTimer
 
 @OptIn(InternalAPI::class)
 class Discoverable(
-    private val port: Int,
-    private val hostname: String,
-    private val discovererConfig: DiscovererConfig
+    private val serviceAddress: String,
+    private val discovererConfig: Config
 ) {
     private val logger = KtorSimpleLogger(this.javaClass.name)
 
@@ -37,7 +36,7 @@ class Discoverable(
             val service = Service(
                 pattern = discovererConfig.servicePattern,
                 identity = discovererConfig.serviceIdentity,
-                rootAddress = "http://$hostname:$port",
+                rootAddress = discovererConfig.serviceAddress.takeIf { it.isNotEmpty() } ?: serviceAddress,
                 timeToLive = discovererConfig.timeToLiveInterval,
                 metadata = discovererConfig.serviceMetadata
             )

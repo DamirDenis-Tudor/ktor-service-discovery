@@ -13,7 +13,7 @@ internal fun Application.module() {
         heartbeatInterval = 10
         timeToLiveInterval = 20
 
-        serviceRegistryHostname = "registry hostname"
+        serviceRegistryHostname = "localhost"
         serviceRegistryPort = 7000
         serviceRegistryRetryInterval = 10
 

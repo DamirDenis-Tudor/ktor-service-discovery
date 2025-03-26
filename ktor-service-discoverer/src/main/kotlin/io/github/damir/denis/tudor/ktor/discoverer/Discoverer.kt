@@ -16,7 +16,7 @@ internal fun main(args: Array<String>) {
 @OptIn(InternalAPI::class)
 internal fun Application.module() {
     install(Discoverer) {
-        serviceRegistryHostname = "registry-hostname"
+        serviceRegistryHostname = "localhost"
         serviceRegistryPort = 7000
         servicesInvalidationInterval = 30
     }
