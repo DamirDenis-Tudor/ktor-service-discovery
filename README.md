@@ -6,6 +6,11 @@
 
 ![Deployment Status](https://img.shields.io/badge/deployment-success-green?style=flat)
 
+## TODO
+[] Discoverer - calls by services criteria (e.g. a service that has a capability listed in publised metadata)
+[] Registry - a more efficient way to store services metadata
+[] Discoverable - micrometer metrics + Discoverer - able to extrat relevant informations
+
 ## Overview
 - This repository contains three plugins that, when used together, provide a service discovery solution for `Ktor-based microservices`:
   - `Registry`: Once installed, it provides a decentralized registry solution based on the gossip protocol.
